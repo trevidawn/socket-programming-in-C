@@ -1,5 +1,5 @@
-./tcp/tcp_socket_client.x
-./tcp/tcp_socket_server.x
+tcp/tcp_socket_client.x
+tcp/tcp_socket_server.x
 
 ./idea
 CMakeLists.txt
