@@ -89,6 +89,15 @@ int main(int argc, char *argv[]) {
                 break;
             }
 
+            // client 프로그램을 강제종료하면, 계속 빈 버퍼를 읽는 무한루프가 발생,
+            // recv()의 리턴값이 0은 에러가 아니지만, 아무데이터도 받지 않는경우가 있을까?
+            // client 프로그램이 강제종료되면 4-way handshaking 은 어떻게 수행될까?
+            if (len_out == 0) {
+                printf("data is empty, client program stop..?");
+                close(client_sd);
+                break;
+            }
+
             printf("client : %s\n", buf);
             if (strcmp(buf, "exit") == 0) {
                 printf("socket is closed\n");
