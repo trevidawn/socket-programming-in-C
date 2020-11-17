@@ -1,5 +1,8 @@
 tcp/tcp_socket_client.x
 tcp/tcp_socket_server.x
+udp/udp_socket_client.x
+udp/udp_socket_server.x
+
 
 ./idea
 CMakeLists.txt
