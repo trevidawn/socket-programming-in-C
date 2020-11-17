@@ -59,6 +59,9 @@ int main(int argc, char *argv[]) {
 
     /*
      * 7. 소켓을 수동 대기모드로 세팅
+     *
+     * listen()의 두번째 파라미터는, 대기가능한 총 client connection 수이다.
+     * 설정된 값보다 많은 수의 연결이 왔을 때, 설정값 이후의 connection은 거절하여 클라이언트가 바로 알 수 있게 한다.
      */
     listen(server_sd, 5);
 
