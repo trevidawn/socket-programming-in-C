@@ -38,19 +38,19 @@ int main() {
             buff[strlen(buff)-1] = '\0';
         } else {
             printf("fgets error\n");
-            return -1;
+            break;
         }
 
-        if (sendto(sd, buff, strlen(buff), 0, (const struct sockaddr *) &server_addr, sizeof(server_addr)) == -1) {
-            printf("UDP server connection error : %s\n", strerror(errno));
-            return -1;
-        }
         // UDP server 를 종료한 후, sendto()를 실행하면 프로그램이 block 되는데, 어떻게 예외처리를 해야 할 까?
         // sendto()가 block 되는 이유는 OS 마다 다르다고 한다.
+        if (sendto(sd, buff, strlen(buff), 0, (const struct sockaddr *) &server_addr, sizeof(server_addr)) == -1) {
+            printf("UDP server connection error : %s\n", strerror(errno));
+            break;
+        }
 
         if (strcmp(buff, "exit") == 0) {
             printf("UDP client exit\n");
-            return 0;
+            break;
         }
 
         n = recvfrom(sd, (char *)buff, BUF_SIZE, MSG_WAITALL, (struct sockaddr *) &server_addr, &len);

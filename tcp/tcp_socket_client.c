@@ -34,7 +34,15 @@ int main(int argc, char *argv[]) {
     }
 
     /*
-     * 3. server_addr 초기화
+     * 3. setsockopt 를 통한 socket 의 옵션 설정
+     */
+    struct linger lingerOpt;
+    lingerOpt.l_onoff = 1;
+    lingerOpt.l_linger = 5;
+    setsockopt(sd, SOL_SOCKET, SO_LINGER, &lingerOpt, sizeof(lingerOpt));
+
+    /*
+     * 4. server_addr 초기화
      *
      * #include <string.h>
      * void bzero(void *s, size_t n);
@@ -43,13 +51,12 @@ int main(int argc, char *argv[]) {
     bzero((char *) &server_addr, sizeof(server_addr));
 
     /*
-     * 4. server 주소 체계 설정
-     *
+     * 5. server 주소 체계 설정
      */
     server_addr.sin_family = AF_INET;
 
     /*
-     * 5. server ip address 설정
+     * 6. server ip address 설정
      *
      * #include <arpa/inet.h>
      * in_addr_t inet_addr(const char *cp);
@@ -59,7 +66,7 @@ int main(int argc, char *argv[]) {
     server_addr.sin_addr.s_addr = inet_addr(ip_addr);
 
     /*
-     * 6. server port 번호 설정
+     * 7. server port 번호 설정
      * #include <arpa/inet.h>
      * uint32_t htonl (uint32_t hostlong);
      * long 타입 데이터를 host 시스템의 byte order 에서 네트워크의 byte order 로 변경해주는 함수.
@@ -67,7 +74,7 @@ int main(int argc, char *argv[]) {
     server_addr.sin_port = htons(8080);
 
     /*
-     * 7. server에 존재하는 socket과 연결 시도, 성공시 0 리턴
+     * 8. server에 존재하는 socket과 연결 시도, 성공시 0 리턴
      * 실패시 -1을 리턴하며, 전역변수 errno에 에러코드가 들어있게 된다.
      */
     if (connect(sd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
@@ -76,7 +83,7 @@ int main(int argc, char *argv[]) {
     }
 
     /*
-     * 8. connect 를 통해 성공적으로 세션이 맺어지면, 이제 Server 와 소켓 통신이 가능하다.
+     * 9. connect 를 통해 성공적으로 세션이 맺어지면, 이제 Server 와 소켓 통신이 가능하다.
      */
     while(1) {
         // 사용자 입력
@@ -85,29 +92,30 @@ int main(int argc, char *argv[]) {
             buf[strlen(buf)-1] = '\0';
         } else {
             printf("fgets error\n");
-            return -1;
+            break;
+        }
+
+        if(strcmp(buf, "exit") == 0) {
+            printf("tcp client close socket!\n");
+            break;
         }
 
         // 입력값 서버로 전송
         if (send(sd, buf, strlen(buf), 0) < 0) {
             printf("send error : %d\n", errno);
-            return -1;
-        }
-
-        if(strcmp(buf, "exit") == 0) {
-            printf("tcp client exit!\n");
             break;
         }
 
         // 서버로부터 데이터 수신
-        printf("Received Message : ");
         if (recv(sd, buf, sizeof(buf)-1, 0) < 0) {
             printf("recv error : %d\n", errno);
+            break;
         }
         buf[BUF_SIZE] = '\0';
 
-        printf("%s\n", buf);
+        printf("Received Message : %s\n", buf);
     }
 
+    //shutdown(sd, SHUT_WR);
     close(sd);
 }

@@ -52,7 +52,5 @@ int main() {
         sendto(server_sd, buff, strlen(buff), 0, (const struct sockaddr *) &client_addr, client_addr_len);
     }
 
-
-
     return 0;
 }
